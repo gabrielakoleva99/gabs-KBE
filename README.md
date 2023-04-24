@@ -14,7 +14,7 @@
 | Name            | Matrikelnummer  |
 | :-------------- | --------------- |
 | Gabriela Koleva | 0570902         |
-| TEAMMITGLIED2 | MATRIKELNUMMER2 |
+| Endrit Limani   | 0569702         |
 
 
 
