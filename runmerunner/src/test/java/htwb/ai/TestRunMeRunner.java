@@ -2,7 +2,6 @@ package htwb.ai;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -23,7 +22,7 @@ public class TestRunMeRunner {
     }
 
     @Test
-    public void noClassSpecifiedShouldReturnError() throws Exception {
+    public void noClassSpecifiedShouldReturnError() {
         // Run the Main class
         Main.main(null);
 
@@ -34,7 +33,7 @@ public class TestRunMeRunner {
     }
 
     @Test
-    public void noClassFoundShouldReturnError() throws Exception {
+    public void noClassFoundShouldReturnError() {
         // Set the system property to point to a test class that doesn't exist
         System.setProperty("classToRun", "blub");
 
