@@ -16,12 +16,16 @@ public class Main {
             try {
                 //retrieve the class
                 className = System.getProperty("classToRun");
-                System.out.println("Analyzed class '" + className + "':");
+                if (className == null) {
+                    System.out.println("No class specified. Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar");
+                    return;
+                }
 
                 //instantiate the class
                 Class<?> runnableClass = Class.forName(className);
 
                 //get all methods, methods with @RunMe and without and print out the findings
+                System.out.println("Analyzed class '" + className + "':");
                 Method[] declaredMethods = runnableClass.getDeclaredMethods();
                 Method[] runnableMethods = getRunnableMethods(declaredMethods, true);
                 Method[] otherMethods = getRunnableMethods(declaredMethods, false);
@@ -57,8 +61,7 @@ public class Main {
                     System.out.println( "Could not instantiate class " +runnableClass.getName());
                 }
             } catch (ClassNotFoundException e) {
-                System.out.println("Could not find class: " + className);
-                System.out.println("Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar\n");
+                System.out.println("Could not find class: " + className + "\nUsage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar");
                // System.out.println(e.getMessage());
             }
 
