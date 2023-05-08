@@ -17,9 +17,9 @@ public class Main {
         String className = System.getProperty("classToRun");
 
         if(className == null || className.isEmpty()) {
-            System.err.println("No classname specified");
-            System.err.println("Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar");
-            System.exit(1);
+            System.out.println("No classname specified");
+            System.out.println("Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar");
+            return;
         }
             try {
                 //retrieve the class
