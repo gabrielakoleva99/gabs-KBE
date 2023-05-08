@@ -1,79 +1,97 @@
-//package htwb.ai;
-//
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import java.io.ByteArrayOutputStream;
-//import java.io.PrintStream;
-//import static org.junit.jupiter.api.Assertions.*;
-//
-//public class TestRunMeRunner {
-//
-//    private ByteArrayOutputStream outContent;
-//
-//    @BeforeEach
-//    public void setUpStreams() {
-//        outContent = new ByteArrayOutputStream();
-//        System.setOut(new PrintStream(outContent));
-//    }
-//
-//    @Test
-//    public void testRunWithNoArgs() {
-//        Main.main(new String[]{});
-//        String expectedOutput = "Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar\n";
-//        assertEquals(expectedOutput, outContent.toString());
-//    }
-//
-//    @Test
-//    public void testRunWithNonexistentClass() {
-//        Main.main(new String[]{"-DclassToRun=nonexistent.class"});
-//        String expectedOutput = "Could not find class: nonexistent.class\n" +
-//                "Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar\n";
-//        assertEquals(expectedOutput, outContent.toString());
-//    }
-//
-//    @Test
-//    public void testRunWithNonInstantiableClass() {
-//        Main.main(new String[]{"-DclassToRun=java.io.Closeable"});
-//        String expectedOutput = "Could not instantiate class java.io.Closeable\n" +
-//                "Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar\n";
-//        assertEquals(expectedOutput, outContent.toString());
-//    }
-//
-//    @Test
-//    public void testRunWithValidClassWithoutRunMeMethods() {
-//        Main.main(new String[]{"-DclassToRun=htwb.ai.NoRunMeClass"});
-//        String expectedOutput = "------------ Analyzed htwb.ai.NoRunMeClass ------------\n" +
-//                "Methods without @RunMe:\n" +
-//                "method1\n" +
-//                "method2\n" +
-//                "method3\n" +
-//                "method4\n" +
-//                "Methods with @RunMe:\n" +
-//                "Methods with @RunMe not invocable:\n";
-//        assertEquals(expectedOutput, outContent.toString());
-//    }
-//
-//    @Test
-//    public void testRunWithValidClassWithRunMeMethods() {
-//        Main.main(new String[]{"-DclassToRun=htwb.ai.RunMeClass"});
-//        String expectedOutput = "------------ Analyzed htwb.ai.RunMeClass ------------\n" +
-//                "Methods without @RunMe:\n" +
-//                "method1\n" +
-//                "method3\n" +
-//                "Methods with @RunMe:\n" +
-//                "method2\n" +
-//                "method4\n" +
-//                "Methods with @RunMe not invocable:\n" +
-//                "method4: java.lang.RuntimeException: This method throws a RuntimeException\n";
-//        assertEquals(expectedOutput, outContent.toString());
-//    }
-//
-//    @Test
-//    public void testRunWithNoClassSpecified() {
-//        Main.main(new String[]{});
-//        String expectedOutput = "No class specified. Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar\n";
-//        assertEquals(expectedOutput, outContent.toString());
-//    }
-//
-//
-//}
+package htwb.ai;
+
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Method;
+
+
+public class TestRunMeRunner {
+
+    private ByteArrayOutputStream outContent;
+
+    @Test
+    public void noInputShouldReturnError() {
+        outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+
+        System.setProperty("classToRun","");
+        // Run the Main class
+        Main.main(null);
+
+        // Verify that the output contains the expected method names and error messages
+        String expectedOutput = "No classname specified" + System.lineSeparator()+ "Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar";
+
+        Assertions.assertEquals(expectedOutput.trim(), outContent.toString().trim());
+    }
+
+    @Test
+    public void noClassFoundShouldReturnError() {
+        outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        // Set the system property to point to a test class that doesn't exist
+        System.setProperty("classToRun", "blub");
+
+        // Run the Main class
+        Main.main(null);
+
+        // Verify that the output contains the expected method names and error messages
+        String expectedOutput = "Analyzed class 'blub':" + System.lineSeparator()+ "Could not find class: blub" + System.lineSeparator()+ "Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar";
+
+        Assertions.assertEquals(expectedOutput.trim(), outContent.toString().trim());
+    }
+
+    @Test
+    public void nonInstantiatableClassFoundShouldReturnError() throws Exception {
+        outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        // Set the system property to point to a test class that doesn't exist
+        System.setProperty("classToRun", "java.io.Closeable");
+
+        // Run the Main class
+        Main.main(null);
+
+        // Verify that the output contains the expected method names and error messages
+        String expectedOutput = "Analyzed class 'java.io.Closeable':"+System.lineSeparator()+"Could not instantiate class java.io.Closeable"+System.lineSeparator()+"Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar";
+
+        Assertions.assertEquals(expectedOutput.trim(), outContent.toString().trim());
+    }
+
+    @Test
+    void testGetRunnableMethods() {
+        Class<?> mockClass = new Object() {
+            @RunMe
+            public void methodPublic() {
+            }
+
+            @RunMe
+            public void methodPublic2() {
+            }
+
+            public void methodNotAnnotated() {
+            }
+        }.getClass();
+        // Call the getRunnableMethods method of Main on the mock class
+        Method[] runnableMethods = Main.getRunnableMethods(mockClass.getDeclaredMethods(), true);
+
+        // Check that the correct number of methods with @RunMe are returned
+        Assertions.assertEquals(2, runnableMethods.length);
+    }
+
+    @Test
+    void testGetNonRunnableMethods() {
+        Class<?> mockClass = new Object() {
+            public void methodNotAnnotated() {
+            }
+        }.getClass();
+        // Call the getRunnableMethods method of Main on the mock class
+        Method[] runnableMethods = Main.getRunnableMethods(mockClass.getDeclaredMethods(), false);
+
+        // Check that the correct number of methods with @RunMe are returned
+        Assertions.assertEquals(2, runnableMethods.length);
+    }
+
+}
