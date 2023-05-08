@@ -12,10 +12,19 @@ import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args){
-        String className = null;
+       // String className = null;
+        // get the class to run from the system property
+        String className = System.getProperty("classToRun");
+
+        if(className == null || className.isEmpty()) {
+            System.err.println("No classname specified");
+            System.err.println("Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar");
+            System.exit(1);
+        }
             try {
                 //retrieve the class
-                className = System.getProperty("classToRun");
+                //   className = System.getProperty("classToRun");
+
                 System.out.println("Analyzed class '" + className + "':");
 
                 //instantiate the class
@@ -25,42 +34,63 @@ public class Main {
                 Method[] declaredMethods = runnableClass.getDeclaredMethods();
                 Method[] runnableMethods = getRunnableMethods(declaredMethods, true);
                 Method[] otherMethods = getRunnableMethods(declaredMethods, false);
-                System.out.println("Methods with @RunMe:");
-                for (Method m : runnableMethods) {
-                    System.out.println(m.getName());
+                if (!runnableClass.getName().startsWith("java.")) { // skip java. classes
+                    System.out.println("Methods with @RunMe:");
+                    for (Method m : runnableMethods) {
+                        System.out.println(m.getName());
+                    }
+                    System.out.println("Methods without @RunMe:");
+                    for (Method m : otherMethods) {
+                        System.out.println(m.getName());
+                    }
                 }
-                System.out.println("Methods without @RunMe:");
-                for (Method m : otherMethods) {
-                    System.out.println(m.getName());
+                if (!runnableClass.getName().startsWith("java.")) { // skip java.io classes
+
+                    //Run all methods with @RunMe and handle eventually occurring exceptions accordingly
+                    System.out.println("Methods with @RunMe not invocable: ");
+                }
+                    try {
+                        Object objKlass = runnableClass.getDeclaredConstructor().newInstance();
+                        for (Method method : runnableMethods) {
+                            try {
+                                method.invoke(objKlass);
+                            } catch (IllegalAccessException e) {
+                                System.out.println(method.getName() + ": IllegalAccessException");
+
+                            } catch (InvocationTargetException e) {
+                                System.out.println(method.getName() + ": InvocationTargetException");
+                                System.out.println("Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar\n");
+
+                            }
+                        }
+                    } catch (InvocationTargetException e) {
+                        System.out.println(runnableClass.getName() + ": InvocationTargetException");
+                        System.out.println("Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar\n");
+
+                    } catch (InstantiationException e) {
+                        System.out.println(runnableClass.getName() + ": InstantiationException");
+                        System.out.println("Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar\n");
+
+                    } catch (IllegalAccessException e) {
+                        System.out.println(runnableClass.getName() + ": IllegalAccessException");
+                        System.out.println("Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar\n");
+
+                    } catch (NoSuchMethodException e) {
+                        System.out.println("Could not instantiate class " + runnableClass.getName());
+                        System.out.println("Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar\n");
+                    }
+
+
+                } catch(ClassNotFoundException e){
+                    System.out.println("Could not find class: " + className);
+                    System.out.println("Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar\n");
+                    // System.out.println(e.getMessage());
+                }catch(NullPointerException e){
+                    System.out.println("No class name given ");
+                    System.out.println("Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar\n");
+
                 }
 
-                //Run all methods with @RunMe and handle eventually occurring exceptions accordingly
-                System.out.println("Methods with @RunMe not invocable: ");
-                try {
-                    Object objKlass = runnableClass.getDeclaredConstructor().newInstance();
-                    for (Method method : runnableMethods) {
-                        try {
-                            method.invoke(objKlass);
-                        } catch (IllegalAccessException e) {
-                            System.out.println(method.getName() + ": IllegalAccessException");
-                        } catch (InvocationTargetException e) {
-                            System.out.println(method.getName() + ": InvocationTargetException");
-                        }
-                    }
-                } catch (InvocationTargetException e) {
-                    System.out.println(runnableClass.getName() + ": InvocationTargetException");
-                } catch (InstantiationException e) {
-                    System.out.println(runnableClass.getName() + ": InstantiationException");
-                } catch (IllegalAccessException e) {
-                    System.out.println(runnableClass.getName() + ": IllegalAccessException");
-                } catch (NoSuchMethodException e) {
-                    System.out.println( "Could not instantiate class " +runnableClass.getName());
-                }
-            } catch (ClassNotFoundException e) {
-                System.out.println("Could not find class: " + className);
-                System.out.println("Usage: java -DclassToRun=your.package.ClassName -jar runmerunner-TEAMNAME.jar\n");
-               // System.out.println(e.getMessage());
-            }
 
         }
 
