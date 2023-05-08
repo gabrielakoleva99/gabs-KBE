@@ -45,7 +45,7 @@ public class TestRunMeRunner {
     }
 
     @Test
-    public void nonInstantiatableClassFoundShouldReturnError() throws Exception {
+    public void nonInstantiatableClassFoundShouldReturnError() {
         outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
         // Set the system property to point to a test class that doesn't exist
