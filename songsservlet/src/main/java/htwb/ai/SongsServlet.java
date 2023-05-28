@@ -104,6 +104,19 @@ public class SongsServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doPut(HttpServletRequest reqest, HttpServletResponse response)
+            throws IOException {
+        response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+
+    }
+
 
     @Override
     public void destroy() {
