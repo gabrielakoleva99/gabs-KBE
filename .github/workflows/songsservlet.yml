@@ -10,14 +10,14 @@ jobs:
     # define os, versions, ...
     strategy:
       matrix:
-        os: [ubuntu-18.04]
-        java: [11]
+        os: [ubuntu-latest]
+        java: [17]
     # run on os ...
     runs-on: ${{ matrix.os }}
     # tomcat service
     services:
       container:
-        image: tomcat:9.0.37-jdk11
+        image: tomcat:10.1.8-jdk17
         ports:
           - 8080:8080
         options:
@@ -25,7 +25,7 @@ jobs:
     # all build steps
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Java 11
+      - name: Set up Java 17
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}

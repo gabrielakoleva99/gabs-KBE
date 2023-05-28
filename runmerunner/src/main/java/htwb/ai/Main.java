@@ -12,7 +12,6 @@ import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args){
-       // String className = null;
         // get the class to run from the system property
         String className = System.getProperty("classToRun");
 
@@ -23,7 +22,6 @@ public class Main {
         }
             try {
                 //retrieve the class
-                //   className = System.getProperty("classToRun");
 
                 System.out.println("Analyzed class '" + className + "':");
 
