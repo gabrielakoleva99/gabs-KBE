@@ -1,16 +1,18 @@
 package htwb.ai;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import jakarta.persistence.PersistenceException;
 import jakarta.servlet.ServletConfig;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.hibernate.ObjectNotFoundException;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,48 +29,21 @@ public class SongsServlet extends HttpServlet {
 
     private String uriToDB = null;
 
+    // http://localhost:8080/songsservlet/songs
+
+
     @Override
     public void init(ServletConfig servletConfig)
             throws ServletException {
-        // Beispiel: Laden eines Initparameters
-        // aus der web.xml
+
         this.uriToDB = servletConfig
                 .getInitParameter("uriToDB");
         super.init(servletConfig);
      emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
         songManager = new SongManager(emf);
         System.out.println("Server initialised");
+
     }
-
-
-    // http://localhost:8080/songsservlet/song
-
-//    @Override
-//    public void init(ServletConfig servletConfig)
-//            throws ServletException {
-//        super.init(servletConfig);
-//        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
-//        songManager = new SongManager(emf);
-//    }
-
-//    @Override
-//    public void init(ServletConfig servletConfig) {
-//        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
-//        songManager = new SongManager(emf);
-//        try {
-//            initSongs();
-//        } catch (IOException e) {
-//            System.out.println("Songs couldn't be loaded");
-//        }
-//    }
-//
-//    private void initSongs() throws IOException {
-//        ObjectMapper objektMapper = new ObjectMapper();
-//        try (Reader reader = new InputStreamReader(Objects.requireNonNull(
-//                SongsServlet.class.getResourceAsStream("/songs.json")))) {
-//            songManager.saveSongList(objektMapper.readValue(reader, new TypeReference<List<Song>>() {
-//            }));
-//        }
 
 
     @Override
@@ -104,35 +79,31 @@ public class SongsServlet extends HttpServlet {
         }
     }
 
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        try {
+            if (request.getContentType() != null) {
+                if (request.getContentType().equals("application/json")) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    Song song = objectMapper.readValue(request.getReader(), Song.class);
+                    if (song.getTitle()==null||song.getArtist()==null||song.getLabel()==null||song.getReleased()==0) {
+                        throw new IllegalArgumentException();
+                    }
+                    Integer id = songManager.saveSong(song);
+                    response.setStatus(HttpServletResponse.SC_CREATED);
+                    response.getOutputStream().print("Location: /songsservlet-gabs-KBE/songs?songId=" + id);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
+        } catch (PersistenceException | JsonParseException | MismatchedInputException | IllegalArgumentException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
 
-//    @Override
-//    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        Enumeration<String> paramNames = request.getParameterNames();
-//        String param = paramNames.nextElement();
-//        response.setContentType("application/json");
-//        try {
-//            if (!paramNames.hasMoreElements() && param != null) {
-//                if (param.equals("all")) {
-//                    List<Song> songs = songManager.findAllSongs();
-//                    ObjectMapper objectMapper = new ObjectMapper();
-//                    objectMapper.writeValue(response.getOutputStream(), songs);
-//                } else if (param.equals("songId")) {
-//                    Song song = songManager.findSong(request.getParameter(param));
-//                    if (song == null) throw new ClassNotFoundException("No such song");
-//                    ObjectMapper objectMapper = new ObjectMapper();
-//                    objectMapper.writeValue(response.getOutputStream(), song);
-//                } else {
-//                    throw new IllegalArgumentException();
-//                }
-//            } else {
-//                throw new IllegalArgumentException();
-//            }
-//        } catch (IllegalArgumentException e) {
-//            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//        } catch (ClassNotFoundException e) {
-//            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-//        }
-//    }
 
     @Override
     public void destroy() {

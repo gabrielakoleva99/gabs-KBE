@@ -22,8 +22,6 @@ public class SongManager {
     }
 
     public Integer saveSong(Song song) throws PersistenceException {
-      //  song.setId(++counter);
-
         EntityManager em = null;
         EntityTransaction transaction;
         try{
@@ -32,6 +30,8 @@ public class SongManager {
             transaction.begin();
             em.persist(song);
             transaction.commit();
+            return song.getId();
+
         }catch (IllegalStateException | EntityExistsException | RollbackException ex){
             if (em != null){
                 em.getTransaction().rollback();
@@ -42,7 +42,6 @@ public class SongManager {
                 em.close();
             }
         }
-        return song.getId();
     }
 
     public void saveSongList(List<Song> songs){
