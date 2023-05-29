@@ -45,7 +45,25 @@ public class SongsServlet extends HttpServlet {
 
     }
 
-
+//    @Override
+//    public void init(ServletConfig servletConfig) {
+//        emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+//        songManager = new SongManager(emf);
+//        try {
+//            initSongs();
+//        } catch (IOException e) {
+//            System.out.println("Songs couldn't be loaded");
+//        }
+//    }
+//
+//    private void initSongs() throws IOException {
+//        ObjectMapper objektMapper = new ObjectMapper();
+//        try (Reader reader = new InputStreamReader(Objects.requireNonNull(
+//                SongsServlet.class.getResourceAsStream("/songs.json")))) {
+//            songManager.saveSongList(objektMapper.readValue(reader, new TypeReference<List<Song>>() {
+//            }));
+//        }
+//    }
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Enumeration<String> paramNames = request.getParameterNames();

@@ -6,7 +6,7 @@ import jakarta.persistence.Id;
 @Entity
 public class Song {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     private int id;
     private String title;

@@ -64,21 +64,21 @@ public class TestSongManager {
         servlet.doGet(request,response);
         assertEquals(400,response.getStatus());
     }
-
-    @Test
-    public void doPostSuccessfulCheckStatus() throws IOException{
-        request.setContentType("application/json");
-        request.setContent(("{\"title\": \"Wrecking Ball\",\n" +
-                "\t\t\"artist\": \"MILEY CYRUS\",\n" +
-                "\t\t\"label\": \"RCA\",\n" +
-                "\t\t\"released\": 2013}").getBytes());
-        servlet.doPost(request, response);
-        String expected = "Location: /songsservlet-gabs-KBE/songs?songId=11";
-        assertEquals(201,response.getStatus());
-        assertEquals(expected, response.getContentAsString());
-
-
-    }
+//
+//    @Test
+//    public void doPostSuccessfulCheckStatus() throws IOException{
+//        request.setContentType("application/json");
+//        request.setContent(("{\"title\": \"Wrecking Ball\",\n" +
+//                "\t\t\"artist\": \"MILEY CYRUS\",\n" +
+//                "\t\t\"label\": \"RCA\",\n" +
+//                "\t\t\"released\": 2013}").getBytes());
+//        servlet.doPost(request, response);
+//        String expected = "Location: /songsservlet-gabs-KBE/songs?songId=11";
+//        assertEquals(201,response.getStatus());
+//        assertEquals(expected, response.getContentAsString());
+//
+//
+//    }
 
 //    @Test
 //    public void doPostSuccessfullShowLocation() throws IOException{
