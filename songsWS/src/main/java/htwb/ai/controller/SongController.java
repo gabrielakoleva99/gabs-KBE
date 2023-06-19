@@ -78,6 +78,7 @@ try {
 //        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 //    }
 
+    //add status code 404 or 405 when unexisting id is chosen
     @PutMapping(path="/songs/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Song> updateSong(@PathVariable(value = "id") Long id,
                                              @RequestBody Song songToPut) {

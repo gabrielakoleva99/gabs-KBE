@@ -1,107 +1,70 @@
 package htwb.ai.modell;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
-@Entity
-public class User {
 
-    @Id
-    private String userId;
-    private String firstname;
-    private String lastname;
-    private String password;
+    @Entity
+    @Table(name = "usertable")
+    public class User {
 
-    private int id;
+//        @Id
+//        @GeneratedValue(strategy = GenerationType.IDENTITY)
+//        private long id;
 
-    public User(){
-
-    }
-
-    private User(Builder builder) {
-        this.id = builder.id;
-        this.userId = builder.userId;
-        this.firstname = builder.firstname;
-        this.lastname = builder.lastname;
-        this.password = builder.password;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userid) {
-        this.userId = userid;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * Creates builder to build {@link User}.
-     * @return created builder
-     */
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * Builder to build {@link User}.
-     */
-    public static final class Builder {
-        private int id;
+        @Id
         private String userId;
-        private String firstname;
-        private String lastname;
+
+        private String firstName;
+
+        private String lastName;
+
         private String password;
 
-        private Builder() {
+        public User() {
         }
 
-        public Builder withId(int id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder withUserId(String userId) {
+        public User(String userId,String password, String firstName, String lastName) {
             this.userId = userId;
-            return this;
-        }
-
-        public Builder withFirstname(String firstname) {
-            this.firstname = firstname;
-            return this;
-        }
-
-        public Builder withLastname(String lastname) {
-            this.lastname = lastname;
-            return this;
-        }
-
-        public Builder withPassword(String password) {
             this.password = password;
-            return this;
+            this.firstName = firstName;
+            this.lastName = lastName;
         }
 
-        public User build() {
-            return new User(this);
+//        public long getId() {
+//            return id;
+//        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public String setFirstName(String firstName) {
+            return this.firstName = firstName;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        @Override
+        public String toString() {
+            return "User  +  userId=" + userId + ", firstName=" + firstName + ", lastName=" + lastName
+                    + ", password=" + password + "]";
         }
     }
-}
