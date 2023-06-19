@@ -1,12 +1,11 @@
 package htwb.ai.modell;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
 
 @Entity
+@Table(name = "song")
 public class Song {
 
     @Id
@@ -17,6 +16,7 @@ public class Song {
     private String artist;
     private String label;
     private int released;
+
 
     public Song() {
 
