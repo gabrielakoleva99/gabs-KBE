@@ -1,5 +1,6 @@
 package htwb.ai.controller;
 
+import htwb.ai.exception.UnsuccessfulAuthorizationException;
 import htwb.ai.modell.User;
 import htwb.ai.repo.SongRepository;
 import htwb.ai.repo.UserRepository;
@@ -40,8 +41,25 @@ public class UserController {
             byte[] randomBytes = new byte[24];
             secureRandom.nextBytes(randomBytes);
             String response = base64Encoder.encodeToString(randomBytes);
+            user.setToken(response);
+            userRepository.save(user);
+            System.out.println("U.GetTOKEN   " + user.getToken());
+
+            System.out.println("USER  : " + user.getUserId() + "TOKEN --> " + user.getToken());
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    public User getByToken(String token){
+        if(token.equals(null)){
+            throw new UnsuccessfulAuthorizationException("User", "token", token);
+        }try {
+            User u = userRepository.findByToken(token);
+            return u;
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        throw new UnsuccessfulAuthorizationException("User", "token", token);
     }
 }

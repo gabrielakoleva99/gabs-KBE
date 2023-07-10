@@ -1,18 +1,16 @@
 package htwb.ai.exception;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.NOT_FOUND)
-
-public class RessourceNotFoundException extends RuntimeException{
+@ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+public class UnsuccessfulAuthorizationException extends RuntimeException{
     private static final long serialVersionUID = 2136472234910389713L;
     private String resourceName;
     private String fieldName;
     private Object fieldValue;
 
-    public RessourceNotFoundException( String resourceName, String fieldName, Object fieldValue) {
-        super(String.format("%s not found with %s : '%s'", resourceName, fieldName, fieldValue));
+    public UnsuccessfulAuthorizationException( String resourceName, String fieldName, Object fieldValue) {
+        super(String.format("%s not authorized with %s : '%s'", resourceName, fieldName, fieldValue));
         this.resourceName = resourceName;
         this.fieldName = fieldName;
         this.fieldValue = fieldValue;
