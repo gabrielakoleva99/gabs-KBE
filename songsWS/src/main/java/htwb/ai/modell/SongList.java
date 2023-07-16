@@ -20,7 +20,7 @@ public class SongList {
 
     private boolean isPrivate;
 
-    @ManyToMany(cascade = CascadeType.MERGE)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "songList_song",
             joinColumns = {@JoinColumn( name = "songlist_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn( name = "song_id", referencedColumnName = "id")})

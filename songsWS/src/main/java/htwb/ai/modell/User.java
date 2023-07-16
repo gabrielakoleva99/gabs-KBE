@@ -25,7 +25,8 @@ import java.util.List;
     private String token;
 
 
-        @OneToMany(mappedBy = "ownerId", orphanRemoval=true, fetch = FetchType.EAGER)
+        @OneToMany(mappedBy = "ownerId", orphanRemoval=true, cascade=CascadeType.ALL,
+                fetch = FetchType.EAGER)
         private List<SongList> lists;
 
 
