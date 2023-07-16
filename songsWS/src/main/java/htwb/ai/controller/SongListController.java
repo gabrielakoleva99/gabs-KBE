@@ -62,6 +62,7 @@ public class SongListController {
         }catch (NullPointerException e){
             throw new UnsuccessfulAuthorizationException("User", "token", authHeader);
         } throw new ForbiddenException("SongList", "Song", id);
+
     }
 
 
@@ -174,14 +175,14 @@ public class SongListController {
                         SongList sl = songListRepo.findSongListByIdAndUserId(id,"jane");
                         songListRepo.delete(sl);
                         return ResponseEntity.noContent().build();
-                    }return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+                    }return new ResponseEntity<>(HttpStatus.NOT_FOUND);
                 }
             } else {
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
             }
         } catch (NullPointerException e) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         }
         throw new UnsuccessfulAuthorizationException("User", "token", authHeader);
