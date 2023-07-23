@@ -91,17 +91,14 @@ public class SongController {
             headers.set("location", path);
             return new ResponseEntity<>(headers, HttpStatus.CREATED);
         } catch (NullPointerException e) {
-            System.out.println("gruh");
             return ResponseEntity.badRequest().build();
         }
             } else {
-                System.out.println("pryc");
                 throw new UnsuccessfulAuthorizationException("User", "token", authHeader);
             }
         } catch (NullPointerException e) {
 
         }
-        System.out.println("mql");
         throw new UnsuccessfulAuthorizationException("User", "token", authHeader);
     }
 

@@ -38,30 +38,31 @@ public class SongListController {
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, path = "/{id}")
     public Iterable<SongList> getSongList(@PathVariable(value = "id") int id, @RequestHeader(value = "Authorization") String authHeader) {
-        try{
-            if(us.getByToken(authHeader).getToken().equals(authHeader)){
-                if(us.getByToken(authHeader).getUserId().equals("maxime")){
-                    if(!songListRepo.findByIdAndOwnerId(id, "maxime").isEmpty()){
+        try {
+            if (us.getByToken(authHeader).getToken().equals(authHeader)) {
+                if (us.getByToken(authHeader).getUserId().equals("maxime")) {
+                    if (!songListRepo.findByIdAndOwnerId(id, "maxime").isEmpty()) {
                         return songListRepo.findByIdAndOwnerId(id, "maxime");
-                    }else if(!songListRepo.findByIsPrivateAndUserIdAndId(false, "jane", id).isEmpty()){
-                        return songListRepo.findByIsPrivateAndUserIdAndId(false,"jane", id);
-                    } else if(!songListRepo.findByIsPrivateAndUserIdAndId(true, "jane", id).isEmpty()) {
+                    } else if (!songListRepo.findByIsPrivateAndUserIdAndId(false, "jane", id).isEmpty()) {
+                        return songListRepo.findByIsPrivateAndUserIdAndId(false, "jane", id);
+                    } else if (!songListRepo.findByIsPrivateAndUserIdAndId(true, "jane", id).isEmpty()) {
                         throw new ForbiddenException("SongList", "Song", id);
                     }
-                }else if(us.getByToken(authHeader).getUserId().equals("jane")){
-                    if(!songListRepo.findByIdAndOwnerId(id, "jane").isEmpty()){
+                } else if (us.getByToken(authHeader).getUserId().equals("jane")) {
+                    if (!songListRepo.findByIdAndOwnerId(id, "jane").isEmpty()) {
                         return songListRepo.findByIdAndOwnerId(id, "jane");
-                    }else if(!songListRepo.findByIsPrivateAndUserIdAndId(false, "maxime", id).isEmpty()){
+                    } else if (!songListRepo.findByIsPrivateAndUserIdAndId(false, "maxime", id).isEmpty()) {
                         return songListRepo.findByIsPrivateAndUserIdAndId(false, "maxime", id);
-                    }else if(!songListRepo.findByIsPrivateAndUserIdAndId(true, "maxime", id).isEmpty()){
+                    } else if (!songListRepo.findByIsPrivateAndUserIdAndId(true, "maxime", id).isEmpty()) {
                         throw new ForbiddenException("SongList", "Song", id);
 
                     }
                 }
             }
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             throw new UnsuccessfulAuthorizationException("User", "token", authHeader);
-        } throw new ForbiddenException("SongList", "Song", id);
+        }
+        throw new ForbiddenException("SongList", "Song", id);
 
     }
 
@@ -70,7 +71,7 @@ public class SongListController {
 
     //GET /songsWS-gabs/rest/songLists?userId=maxime
     //Accept: application/json
-    @RequestMapping(method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     public Iterable<SongList> getAllSongLists(@RequestParam(value = "userId") String userId, @RequestHeader(value = "Authorization") String authHeader) {
         try {
             if (us.getByToken(authHeader).getToken().equals(authHeader)) {
@@ -83,12 +84,12 @@ public class SongListController {
                 } else if (us.getByToken(authHeader).getUserId().equals("jane")) {
                     if (userId.equals("jane")) {
                         return songListRepo.selectSongListByUser("jane");
-                    } else if(userId.equals("maxime")){
+                    } else if (userId.equals("maxime")) {
                         return songListRepo.findByIsPrivateAndUserId(false, "maxime");
                     }
                 } else throw new RessourceNotFoundException("User", "userId", userId);
             }
-        }catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             throw new UnsuccessfulAuthorizationException("User", "token", authHeader);
         }
         throw new RessourceNotFoundException("User", "userId", userId);
@@ -123,7 +124,7 @@ public class SongListController {
     //opravi payloada
     @PostMapping
     public ResponseEntity<String> createSongList(@RequestBody SongList songList, @RequestHeader(value = "Authorization") String authHeader) {
-        try{
+        try {
             if (us.getByToken(authHeader).getToken().equals(authHeader)) {
 
                 if (songList.getSongs() == null) {
@@ -145,7 +146,7 @@ public class SongListController {
                 String songLocation = "Location: /songLists/" + songList.getId();
                 return new ResponseEntity<>(songLocation, HttpStatus.OK);
             }
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -162,20 +163,21 @@ public class SongListController {
         try {
             if (us.getByToken(authHeader).getToken().equals(authHeader)) {
                 if (us.getByToken(authHeader).getUserId().equals("maxime")) {
-                    if(!songListRepo.findByIdAndOwnerId(id, "jane").isEmpty()) {
-                        SongList sl = songListRepo.findSongListByIdAndUserId(id,"maxime");
+                    if (!songListRepo.findByIdAndOwnerId(id, "maxime").isEmpty()) {
+                        SongList sl = songListRepo.findSongListByIdAndUserId(id, "maxime");
                         songListRepo.delete(sl);
                         return ResponseEntity.noContent().build();
-                    } else{
+                    } else {
                         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
                     }
 
-                } else if(us.getByToken(authHeader).getUserId().equals("jane")){
-                    if(!songListRepo.findByIdAndOwnerId(id, "jane").isEmpty()){
-                        SongList sl = songListRepo.findSongListByIdAndUserId(id,"jane");
+                } else if (us.getByToken(authHeader).getUserId().equals("jane")) {
+                    if (!songListRepo.findByIdAndOwnerId(id, "jane").isEmpty()) {
+                        SongList sl = songListRepo.findSongListByIdAndUserId(id, "jane");
                         songListRepo.delete(sl);
                         return ResponseEntity.noContent().build();
-                    }return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                    }
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
                 }
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -188,4 +190,63 @@ public class SongListController {
         throw new UnsuccessfulAuthorizationException("User", "token", authHeader);
     }
 
+
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<?> updateSongList(@PathVariable(value = "id") int id, @RequestBody SongList songList, @RequestHeader(value = "Authorization") String authHeader) {
+        try {
+            if (us.getByToken(authHeader).getToken().equals(authHeader)) {
+                if (songList.getSongs() == null) {
+                    System.out.println("pryc");
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+                for (Song s : songList.getSongs()) {
+                    if (!songRepo.existsById((long) s.getId())) {
+                        System.out.println("tryc");
+
+                        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                    }
+                }
+                if (us.getByToken(authHeader).getUserId().equals("maxime")) {
+                    if (!songListRepo.findByIdAndOwnerId(id, "maxime").isEmpty()) {
+                        SongList sl = songListRepo.findSongListByIdAndUserId(id, "maxime");
+                        sl.setName(songList.getName());
+                        sl.setPrivate(songList.isPrivate());
+                        sl.setSongs(songList.getSongs());
+                        sl.setOwnerId(us.getByToken(authHeader));
+                        songListRepo.save(sl);
+                        return new ResponseEntity<>(HttpStatus.OK);
+                    } else {
+                        System.out.println("mql");
+                        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+                    }
+                } else if (us.getByToken(authHeader).getUserId().equals("jane")) {
+                    if (!songListRepo.findByIdAndOwnerId(id, "jane").isEmpty()) {
+                        SongList sl = songListRepo.findSongListByIdAndUserId(id, "jane");
+                        sl.setName(songList.getName());
+                        sl.setPrivate(songList.isPrivate());
+                        sl.setSongs(songList.getSongs());
+                        sl.setOwnerId(us.getByToken(authHeader));
+                        songListRepo.save(sl);
+                        return new ResponseEntity<>(HttpStatus.OK);
+                    }else {
+                        System.out.println("bau");
+                        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+                    }
+                }
+            } else {
+                System.out.println("gruh");
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+            }
+        } catch (NullPointerException e) {
+            throw new UnsuccessfulAuthorizationException("User", "token", authHeader);
+
+
+        }
+        System.out.println("MUUUUU");
+
+        throw new UnsuccessfulAuthorizationException("User", "token", authHeader);
+
+    }
 }
+
